@@ -15,7 +15,112 @@
 
   Once you've implemented the logic, test your code by running
 */
+class Calculator {
+  constructor() {
+    this.result = 0;
+  }
 
-class Calculator {}
+  add(number) {
+    this.result += number;
+  }
+
+  subtract(number) {
+    this.result -= number;
+  }
+
+  multiply(number) {
+    this.result *= number;
+  }
+
+  divide(number) {
+    if (number === 0) {
+      throw new Error("Division by zero");
+    }
+    this.result /= number;
+  }
+
+  clear() {
+    this.result = 0;
+  }
+
+  getResult() {
+    return this.result;
+  }
+  calculate(expression) {
+    // Remove extra spaces
+    expression = expression.trim().replace(/\s+/g, " ");
+
+    // Stack for operands and operators
+    const operands = [];
+    const operators = [];
+
+    // Loop through each character
+    for (let i = 0; i < expression.length; i++) {
+      const char = expression[i];
+
+      // Handle digits and decimals
+      if (!isNaN(Number(char)) || char === ".") {
+        let number = char;
+        while (
+          (i + 1 < expression.length && !isNaN(Number(expression[i + 1]))) ||
+          expression[i + 1] === "."
+        ) {
+          number += expression[i + 1];
+          i++;
+        }
+        operands.push(Number(number));
+      }
+
+      // Handle operators
+      else if (["+", "-", "*", "/"].includes(char)) {
+        operators.push(char);
+      }
+
+      // Handle parentheses
+      else if (char === "(") {
+        operators.push("(");
+      } else if (char === ")") {
+        while (operators.length && operators[operators.length - 1] !== "(") {
+          this._performOperation(operands, operators);
+        }
+        operators.pop(); // Remove '('
+      }
+
+      // Check for invalid characters
+      else {
+        throw new Error(`Invalid character: ${char}`);
+      }
+    }
+
+    // Perform remaining operations
+    while (operators.length) {
+      this._performOperation(operands, operators);
+    }
+
+    // Result
+    this.result = operands[0];
+  }
+
+  _performOperation(operands, operators) {
+    const operator = operators.pop();
+    const operand2 = operands.pop();
+    const operand1 = operands.pop();
+
+    switch (operator) {
+      case "+":
+        operands.push(operand1 + operand2);
+        break;
+      case "-":
+        operands.push(operand1 - operand2);
+        break;
+      case "*":
+        operands.push(operand1 * operand2);
+        break;
+      case "/":
+        operands.push(operand1 / operand2);
+        break;
+    }
+  }
+}
 
 module.exports = Calculator;
